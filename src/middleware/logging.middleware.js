@@ -2,8 +2,8 @@
  * Request logging middleware
  */
 const morgan = require('morgan');
-const { environment } = require('../../config');
-const logger = require('../../utils/logger');
+const { environment } = require('../config');
+const logger = require('../utils/logger');
 
 // Custom token for request ID
 morgan.token('id', req => req.id);

@@ -1,6 +1,6 @@
 const express = require('express');
 const { environment } = require('./config');
-const middlewares = require('./api/middlewares');
+const globalMiddlewares = require('./middleware');
 const apiRoutes = require('./api');
 const logger = require('./utils/logger');
 const { CustomError } = require('./utils/errors');
@@ -8,7 +8,7 @@ const pkg = require('../package.json');
 
 const app = express();
 
-middlewares.forEach(middleware => {
+globalMiddlewares.forEach(middleware => {
     app.use(middleware);
 });
 
