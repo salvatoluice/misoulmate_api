@@ -9,7 +9,7 @@ module.exports = {
 
     return queryInterface.bulkInsert('users', [{
       id: uuidv4(),
-      email: 'test@example.com',
+      email: 'test2@example.com',
       password: hashedPassword,
       verified: true,
       subscription: 'Premium',
