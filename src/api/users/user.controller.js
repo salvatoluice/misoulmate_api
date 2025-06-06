@@ -1,15 +1,6 @@
-/**
- * User controller
- */
 const userService = require('../../services/user.service');
 const profileService = require('../../services/profile.service');
 
-/**
- * Get current user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const getCurrentUser = async (req, res, next) => {
     try {
         const user = await userService.getUserWithProfile(req.user.id);
@@ -19,12 +10,6 @@ const getCurrentUser = async (req, res, next) => {
     }
 };
 
-/**
- * Get user by ID
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const getUserById = async (req, res, next) => {
     try {
         const user = await userService.getUserById(req.params.id);
@@ -34,12 +19,6 @@ const getUserById = async (req, res, next) => {
     }
 };
 
-/**
- * Update user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const updateUser = async (req, res, next) => {
     try {
         const user = await userService.updateUser(req.user.id, req.body);
@@ -49,12 +28,6 @@ const updateUser = async (req, res, next) => {
     }
 };
 
-/**
- * Delete user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const deleteUser = async (req, res, next) => {
     try {
         await userService.deleteUser(req.user.id);
@@ -64,12 +37,6 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
-/**
- * Update notification settings
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const updateNotifications = async (req, res, next) => {
     try {
         const user = await userService.updateNotificationSettings(req.user.id, req.body.notifications);

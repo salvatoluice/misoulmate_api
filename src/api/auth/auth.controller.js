@@ -1,14 +1,5 @@
-/**
- * Auth controller
- */
 const authService = require('../../services/auth.service');
 
-/**
- * Register new user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const register = async (req, res, next) => {
     try {
         const { profile, ...userData } = req.body;
@@ -19,12 +10,6 @@ const register = async (req, res, next) => {
     }
 };
 
-/**
- * Login user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
@@ -35,12 +20,6 @@ const login = async (req, res, next) => {
     }
 };
 
-/**
- * Verify email
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const verifyEmail = async (req, res, next) => {
     try {
         await authService.verifyEmail(req.body.token);
@@ -50,12 +29,6 @@ const verifyEmail = async (req, res, next) => {
     }
 };
 
-/**
- * Request password reset
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const requestPasswordReset = async (req, res, next) => {
     try {
         await authService.requestPasswordReset(req.body.email);
@@ -65,12 +38,6 @@ const requestPasswordReset = async (req, res, next) => {
     }
 };
 
-/**
- * Reset password
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const resetPassword = async (req, res, next) => {
     try {
         const { token, password } = req.body;
@@ -81,12 +48,6 @@ const resetPassword = async (req, res, next) => {
     }
 };
 
-/**
- * Change password
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const changePassword = async (req, res, next) => {
     try {
         const { currentPassword, newPassword } = req.body;
