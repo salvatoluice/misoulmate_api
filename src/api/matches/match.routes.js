@@ -46,6 +46,13 @@ router.get(
     matchController.getMatchById
 );
 
+router.get(
+    '/messages',
+    auth.authenticate,
+    validation.validate(matchValidator.getQuerySchema, 'query'),
+    matchController.getMatchesWithMessages
+  );
+
 router.post(
     '/:id/unmatch',
     auth.authenticate,

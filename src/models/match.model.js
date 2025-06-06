@@ -18,10 +18,12 @@ class Match extends Model {
             as: 'unmatchedBy'
         });
 
-        Match.hasMany(models.Message, {
-            foreignKey: 'match_id',
-            as: 'messages'
-        });
+        if (models.Message) {
+            Match.hasMany(models.Message, {
+                foreignKey: 'match_id',
+                as: 'messages'
+            });
+        }
     }
 }
 

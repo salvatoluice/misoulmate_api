@@ -194,6 +194,17 @@ const getMatchStats = async (userId) => {
     };
 };
 
+const getUserMatchesWithMessages = async (userId, options = {}) => {
+    const matches = await getUserMatches(userId, options);
+
+    const enrichedMatches = await messageService.enrichMatchesWithMessages(matches.rows, userId);
+
+    return {
+        count: matches.count,
+        rows: enrichedMatches
+    };
+  };
+
 module.exports = {
     createLike,
     getUserLikes,
@@ -203,5 +214,6 @@ module.exports = {
     unmatchUsers,
     calculateCompatibilityScore,
     getLikers,
-    getMatchStats
+    getMatchStats,
+    getUserMatchesWithMessages
 };

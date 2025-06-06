@@ -1,9 +1,15 @@
-const authMiddleware = require('./auth.middleware');
-const validationMiddleware = require('./validation.middleware');
-const errorMiddleware = require('./error.middleware');
+/**
+ * Combine and export all global middlewares
+ */
+const corsMiddleware = require('./cors.middleware');
+const helmetMiddleware = require('./helmet.middleware');
+const loggingMiddleware = require('./logging.middleware');
+const validation = require('./validation.middleware');
 
-module.exports = {
-    auth: authMiddleware,
-    validation: validationMiddleware,
-    error: errorMiddleware
-};
+// Export middlewares in the order they should be applied
+module.exports = [
+    loggingMiddleware,
+    corsMiddleware,
+    helmetMiddleware,
+    validation
+];

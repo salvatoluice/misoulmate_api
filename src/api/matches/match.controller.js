@@ -106,6 +106,27 @@ const getMatchStats = async (req, res, next) => {
     }
 };
 
+const getMatchesWithMessages = async (req, res, next) => {
+    try {
+        const { limit = 20, page = 1, status = 'active' } = req.query;
+        const offset = (page - 1) * limit;
+
+        const matches = await matchService.getUserMatchesWithMessages(req.user.id, { limit, offset, status });
+
+        res.json({
+            matches: matches.rows,
+            pagination: {
+                total: matches.count,
+                page,
+                limit,
+                pages: Math.ceil(matches.count / limit)
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+  };
+
 module.exports = {
     createLike,
     getLikesGiven,
@@ -113,5 +134,6 @@ module.exports = {
     getMatches,
     getMatchById,
     unmatch,
-    getMatchStats
+    getMatchStats,
+    getMatchesWithMessages
 };

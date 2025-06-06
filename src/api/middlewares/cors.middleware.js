@@ -2,7 +2,7 @@
  * CORS middleware
  */
 const cors = require('cors');
-const { environment } = require('../config');
+const { environment } = require('../../config');
 
 const corsOptions = {
     origin: environment.CORS_ORIGIN,
