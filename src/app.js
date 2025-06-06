@@ -1,6 +1,6 @@
 const express = require('express');
 const { environment } = require('./config');
-const middlewares = require('./middleware');
+const middlewares = require('../src/api/middlewares');
 const apiRoutes = require('./api');
 const logger = require('./utils/logger');
 const { CustomError } = require('./utils/errors');

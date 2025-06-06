@@ -59,10 +59,10 @@ Match.init({
         allowNull: true,
         field: 'last_message_at'
     },
-    unmatchedBy: {
+    unmatchedById: {
         type: DataTypes.UUID,
         allowNull: true,
-        field: 'unmatched_by'
+        field: 'unmatched_by' // This keeps the DB column name unchanged
     },
     unmatchedReason: {
         type: DataTypes.STRING,
