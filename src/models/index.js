@@ -1,22 +1,23 @@
-/**
- * Export all models
- */
 const User = require('./user.model');
 const Profile = require('./profile.model');
 const ProfileQuestion = require('./profile-question.model');
+const Match = require('./match.model');
+const Like = require('./like.model');
 
-// Set up associations
 const setupAssociations = () => {
     User.associate({ Profile });
     Profile.associate({ User, ProfileQuestion });
     ProfileQuestion.associate({ Profile });
+    Match.associate({ User });
+    Like.associate({ User });
 };
 
-// Call the function to set up associations
 setupAssociations();
 
 module.exports = {
     User,
     Profile,
-    ProfileQuestion
+    ProfileQuestion,
+    Match,
+    Like
 };
