@@ -1,0 +1,95 @@
+/**
+ * Profile validators
+ */
+const Joi = require('joi');
+
+/**
+ * Create profile schema
+ */
+const createSchema = Joi.object({
+    name: Joi.string().required(),
+    age: Joi.number().integer().min(18),
+    bio: Joi.string(),
+    location: Joi.string(),
+    occupation: Joi.string(),
+    education: Joi.string(),
+    height: Joi.string(),
+    photos: Joi.array().items(Joi.string()),
+    interests: Joi.array().items(Joi.string()),
+    languages: Joi.array().items(Joi.string()),
+    lookingFor: Joi.string(),
+    showMe: Joi.string(),
+    ageRange: Joi.array().items(Joi.number().integer()).length(2),
+    maxDistance: Joi.number().integer().positive(),
+    drinking: Joi.string(),
+    smoking: Joi.string(),
+    zodiac: Joi.string(),
+    instagram: Joi.string(),
+    spotifyArtists: Joi.array().items(Joi.string()),
+    questions: Joi.array().items(
+        Joi.object({
+            question: Joi.string().required(),
+            answer: Joi.string().required()
+        })
+    )
+});
+
+/**
+ * Update profile schema
+ */
+const updateSchema = Joi.object({
+    name: Joi.string(),
+    age: Joi.number().integer().min(18),
+    bio: Joi.string(),
+    location: Joi.string(),
+    occupation: Joi.string(),
+    education: Joi.string(),
+    height: Joi.string(),
+    photos: Joi.array().items(Joi.string()),
+    interests: Joi.array().items(Joi.string()),
+    languages: Joi.array().items(Joi.string()),
+    lookingFor: Joi.string(),
+    showMe: Joi.string(),
+    ageRange: Joi.array().items(Joi.number().integer()).length(2),
+    maxDistance: Joi.number().integer().positive(),
+    drinking: Joi.string(),
+    smoking: Joi.string(),
+    zodiac: Joi.string(),
+    instagram: Joi.string(),
+    spotifyArtists: Joi.array().items(Joi.string()),
+    questions: Joi.array().items(
+        Joi.object({
+            question: Joi.string().required(),
+            answer: Joi.string().required()
+        })
+    )
+}).min(1);
+
+/**
+ * Profile ID param schema
+ */
+const idParamSchema = Joi.object({
+    id: Joi.string().uuid().required()
+});
+
+/**
+ * Update photos schema
+ */
+const updatePhotosSchema = Joi.object({
+    photos: Joi.array().items(Joi.string()).required().min(1)
+});
+
+/**
+ * Update interests schema
+ */
+const updateInterestsSchema = Joi.object({
+    interests: Joi.array().items(Joi.string()).required().min(1)
+});
+
+module.exports = {
+    createSchema,
+    updateSchema,
+    idParamSchema,
+    updatePhotosSchema,
+    updateInterestsSchema
+};
