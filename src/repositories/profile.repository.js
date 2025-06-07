@@ -5,12 +5,12 @@ const cloudinaryService = require('../services/cloudinary.service');
 const create = async (profileData) => {
     if (profileData.photos && Array.isArray(profileData.photos) && profileData.photos.length > 0) {
         const folderPath = `misoulmate/profiles/${profileData.userId}`;
-        const photoUrls = await cloudinaryService.uploadMultipleImages(profileData.photos, {
+        const photoUrls = await cloudinaryService.uploadMultipleBase64(profileData.photos, {
             folder: folderPath
         });
 
         profileData.photos = photoUrls;
-    }
+      }
 
     const profile = await Profile.create(profileData);
 
