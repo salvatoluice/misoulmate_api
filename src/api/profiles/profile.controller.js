@@ -4,12 +4,6 @@
 const profileService = require('../../services/profile.service');
 const { ForbiddenError } = require('../../utils/errors');
 
-/**
- * Get current user's profile
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const getCurrentProfile = async (req, res, next) => {
     try {
         const profile = await profileService.getProfileByUserId(req.user.id);
@@ -19,12 +13,6 @@ const getCurrentProfile = async (req, res, next) => {
     }
 };
 
-/**
- * Create profile
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const createProfile = async (req, res, next) => {
     try {
         const profileData = {
@@ -39,12 +27,6 @@ const createProfile = async (req, res, next) => {
     }
 };
 
-/**
- * Get profile by ID
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const getProfileById = async (req, res, next) => {
     try {
         const profile = await profileService.getProfileById(req.params.id);
@@ -54,12 +36,6 @@ const getProfileById = async (req, res, next) => {
     }
 };
 
-/**
- * Update profile
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
 const updateProfile = async (req, res, next) => {
     try {
         // Get user's profile

@@ -1,11 +1,5 @@
-/**
- * Profile validators
- */
 const Joi = require('joi');
 
-/**
- * Create profile schema
- */
 const createSchema = Joi.object({
     name: Joi.string().required(),
     age: Joi.number().integer().min(18),
@@ -34,9 +28,6 @@ const createSchema = Joi.object({
     )
 });
 
-/**
- * Update profile schema
- */
 const updateSchema = Joi.object({
     name: Joi.string(),
     age: Joi.number().integer().min(18),
