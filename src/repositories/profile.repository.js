@@ -1,7 +1,17 @@
 const { Profile, ProfileQuestion } = require('../models');
 const { NotFoundError } = require('../utils/errors');
+const cloudinaryService = require('../services/cloudinary.service');
 
 const create = async (profileData) => {
+    if (profileData.photos && Array.isArray(profileData.photos) && profileData.photos.length > 0) {
+        const folderPath = `misoulmate/profiles/${profileData.userId}`;
+        const photoUrls = await cloudinaryService.uploadMultipleImages(profileData.photos, {
+            folder: folderPath
+        });
+
+        profileData.photos = photoUrls;
+    }
+
     const profile = await Profile.create(profileData);
 
     if (profileData.questions && profileData.questions.length > 0) {
@@ -14,7 +24,7 @@ const create = async (profileData) => {
     }
 
     return findById(profile.id);
-};
+  };
 
 const findById = async (id) => {
     const profile = await Profile.findByPk(id, {
@@ -54,6 +64,25 @@ const findByUserId = async (userId) => {
 const update = async (id, updateData) => {
     const profile = await findById(id);
 
+    if (updateData.photos && Array.isArray(updateData.photos) && updateData.photos.length > 0) {
+        const existingUrls = updateData.photos.filter(photo =>
+            typeof photo === 'string' && (photo.startsWith('http') || photo.startsWith('https'))
+        );
+
+        const newPhotos = updateData.photos.filter(photo =>
+            !(typeof photo === 'string' && (photo.startsWith('http') || photo.startsWith('https')))
+        );
+
+        if (newPhotos.length > 0) {
+            const folderPath = `misoulmate/profiles/${profile.userId}`;
+            const newPhotoUrls = await cloudinaryService.uploadMultipleImages(newPhotos, {
+                folder: folderPath
+            });
+
+            updateData.photos = [...existingUrls, ...newPhotoUrls];
+        }
+    }
+
     const { questions, ...profileData } = updateData;
 
     await profile.update(profileData);
@@ -72,7 +101,7 @@ const update = async (id, updateData) => {
     }
 
     return findById(id);
-};
+  };
 
 const remove = async (id) => {
     const profile = await findById(id);

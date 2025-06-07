@@ -33,7 +33,35 @@ const deleteProfile = async (id) => {
 };
 
 const updateProfilePhotos = async (id, photos) => {
-    return profileRepository.update(id, { photos });
+    const profile = await profileRepository.findById(id);
+
+    const folderPath = `misoulmate/profiles/${profile.userId}`;
+
+    const photoUrls = await cloudinaryService.uploadMultipleImages(photos, {
+        folder: folderPath
+    });
+
+    const existingPhotos = profile.photos || [];
+
+    const updatedPhotos = [...existingPhotos, ...photoUrls];
+
+    return profileRepository.update(id, { photos: updatedPhotos });
+};
+
+const deleteProfilePhoto = async (id, photoUrl) => {
+    const profile = await profileRepository.findById(id);
+
+    const currentPhotos = profile.photos || [];
+
+    if (!currentPhotos.includes(photoUrl)) {
+        throw new BadRequestError('Photo not found');
+    }
+
+    await cloudinaryService.deleteImage(photoUrl);
+
+    const updatedPhotos = currentPhotos.filter(url => url !== photoUrl);
+
+    return profileRepository.update(id, { photos: updatedPhotos });
 };
 
 const updateProfileInterests = async (id, interests) => {
@@ -52,5 +80,6 @@ module.exports = {
     deleteProfile,
     updateProfilePhotos,
     updateProfileInterests,
-    updateLastActive
+    updateLastActive,
+    deleteProfilePhoto
 };

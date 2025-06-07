@@ -22,6 +22,11 @@ const environment = {
     JWT_SECRET: process.env.JWT_SECRET || 'your-secret-key',
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
 
+    //cloudinary
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+
     // API
     API_PREFIX: process.env.API_PREFIX || '/api/v1',
 

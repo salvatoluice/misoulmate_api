@@ -1,8 +1,20 @@
 const authService = require('../../services/auth.service');
 
+const multer = require('multer');
+const upload = multer({
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    }
+});
+
 const register = async (req, res, next) => {
     try {
         const { profile, ...userData } = req.body;
+
+        if (req.files && req.files.length > 0 && profile) {
+            profile.photos = req.files;
+        }
+
         const result = await authService.register(userData, profile);
         res.status(201).json(result);
     } catch (error) {
@@ -64,5 +76,6 @@ module.exports = {
     verifyEmail,
     requestPasswordReset,
     resetPassword,
-    changePassword
+    changePassword,
+    uploadMiddleware: upload
 };

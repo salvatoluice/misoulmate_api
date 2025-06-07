@@ -7,10 +7,10 @@ const router = express.Router();
 
 router.post(
     '/register',
+    authController.uploadMiddleware.array('photos', 5),
     validation.validate(authValidator.registerSchema),
     authController.register
 );
-
 
 router.post(
     '/login',

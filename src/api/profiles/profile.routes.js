@@ -18,6 +18,13 @@ router.post(
     profileController.createProfile
 );
 
+// router.post(
+//   '/photos',
+//   auth.authenticate,
+//   profileController.uploadMiddleware.array('photos', 5),
+//   profileController.uploadPhotos
+// );
+
 router.get(
     '/:id',
     auth.authenticate,
@@ -29,9 +36,9 @@ router.patch(
     '/:id',
     auth.authenticate,
     validation.validate(profileValidator.idParamSchema, 'params'),
-    validation.validate(profileValidator.updateSchema),
+    profileController.uploadMiddleware.array('photos', 6),
     profileController.updateProfile
-);
+  );
 
 router.patch(
     '/me/photos',
@@ -52,5 +59,11 @@ router.put(
     auth.authenticate,
     profileController.updateLastActive
 );
+
+// router.delete(
+//     '/photos/:photoUrl',
+//     auth.authenticate,
+//     profileController.deletePhoto
+//   );
 
 module.exports = router;

@@ -63,18 +63,16 @@ const idParamSchema = Joi.object({
     id: Joi.string().uuid().required()
 });
 
-/**
- * Update photos schema
- */
 const updatePhotosSchema = Joi.object({
     photos: Joi.array().items(Joi.string()).required().min(1)
 });
 
-/**
- * Update interests schema
- */
 const updateInterestsSchema = Joi.object({
     interests: Joi.array().items(Joi.string()).required().min(1)
+});
+
+const deletePhotoSchema = Joi.object({
+    photoUrl: Joi.string().uri().required()
 });
 
 module.exports = {
@@ -82,5 +80,6 @@ module.exports = {
     updateSchema,
     idParamSchema,
     updatePhotosSchema,
-    updateInterestsSchema
+    updateInterestsSchema,
+    deletePhotoSchema
 };
