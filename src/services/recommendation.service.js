@@ -5,6 +5,54 @@ const { Profile, User, ProfileView, ProfileBoost, ProfileFilter, ProfileReport }
 const { Op } = require('sequelize');
 const { NotFoundError, BadRequestError, ForbiddenError } = require('../utils/errors');
 
+const calculateCompatibilityScore = async (userId1, userId2) => {
+    try {
+        const profile1 = await profileRepository.findByUserId(userId1);
+        const profile2 = await profileRepository.findByUserId(userId2);
+
+        let score = 0;
+        let factors = 0;
+
+        if (profile1.interests && profile2.interests) {
+            const interests1 = new Set(profile1.interests);
+            const interests2 = new Set(profile2.interests);
+
+            const commonInterests = [...interests1].filter(x => interests2.has(x));
+
+            const interestScore = Math.min(40, commonInterests.length * 10);
+            score += interestScore;
+            factors++;
+        }
+
+        if (profile1.ageRange && profile2.age) {
+            const [minAge, maxAge] = profile1.ageRange;
+            if (profile2.age >= minAge && profile2.age <= maxAge) {
+                score += 20;
+            }
+            factors++;
+        }
+
+        if (profile2.ageRange && profile1.age) {
+            const [minAge, maxAge] = profile2.ageRange;
+            if (profile1.age >= minAge && profile1.age <= maxAge) {
+                score += 20;
+            }
+            factors++;
+        }
+
+        if (profile1.lookingFor && profile2.lookingFor &&
+            profile1.lookingFor === profile2.lookingFor) {
+            score += 20;
+            factors++;
+        }
+
+        return factors > 0 ? Math.min(100, Math.round(score / factors * 100)) : 50;
+    } catch (error) {
+        console.error('Error calculating compatibility score:', error);
+        return 50;
+    }
+};
+
 const getRecommendationsForUser = async (userId, options = {}) => {
     const {
         limit = 20,
@@ -35,10 +83,28 @@ const getRecommendationsForUser = async (userId, options = {}) => {
         profileWhereClause.age = { [Op.between]: userProfile.ageRange };
     }
 
+    const mapShowMeToGender = (showMeValue) => {
+        if (!showMeValue || showMeValue === 'Everyone') return null;
+
+        const mapping = {
+            'Men': 'male',
+            'Women': 'female',
+            'Non-binary': 'non-binary'
+        };
+
+        return mapping[showMeValue] || null;
+    };
+
     if (showMe) {
-        profileWhereClause.gender = showMe;
+        const mappedGender = mapShowMeToGender(showMe);
+        if (mappedGender) {
+            profileWhereClause.gender = mappedGender;
+        }
     } else if (userProfile.showMe && userProfile.showMe !== 'Everyone') {
-        profileWhereClause.gender = userProfile.showMe;
+        const mappedGender = mapShowMeToGender(userProfile.showMe);
+        if (mappedGender) {
+            profileWhereClause.gender = mappedGender;
+        }
     }
 
     if (interests && interests.length > 0) {
