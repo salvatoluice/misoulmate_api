@@ -72,7 +72,7 @@ const getRecommendationsForUser = async (userId, options = {}) => {
 
     if (!includePassedProfiles) {
         interactions.rows.forEach(like => {
-            if (like.status === 'pass') {
+            if (like.status === 'dislike') {
                 interactedIds.add(like.likedId);
             }
         });
