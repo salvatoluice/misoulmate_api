@@ -203,7 +203,7 @@ const getUserMatchesWithMessages = async (userId, options = {}) => {
         count: matches.count,
         rows: enrichedMatches
     };
-  };
+};
 
 module.exports = {
     createLike,

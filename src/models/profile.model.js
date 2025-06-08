@@ -40,6 +40,10 @@ Profile.init({
     age: {
         type: DataTypes.INTEGER
     },
+    gender: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     bio: {
         type: DataTypes.TEXT
     },

@@ -4,6 +4,10 @@ const ProfileQuestion = require('./profile-question.model');
 const Match = require('./match.model');
 const Like = require('./like.model');
 const Message = require('./message.model');
+const ProfileBoost = require('./profileBoost.model');
+const ProfileView = require('./profileView.model');
+const ProfileFilter = require('./profileFilter.model');
+const ProfileReport = require('./profileReport.model');
 
 const models = {
     User,
@@ -11,7 +15,11 @@ const models = {
     ProfileQuestion,
     Match,
     Like,
-    Message
+    Message,
+    ProfileBoost,
+    ProfileView,
+    ProfileFilter,
+    ProfileReport
 };
 
 Object.keys(models).forEach(modelName => {
