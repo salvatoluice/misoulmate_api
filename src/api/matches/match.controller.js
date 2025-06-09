@@ -1,4 +1,5 @@
 const matchService = require('../../services/match.service');
+const messageService = require('../../services/message.service');
 
 const createLike = async (req, res, next) => {
     try {
@@ -78,10 +79,60 @@ const getMatches = async (req, res, next) => {
     }
 };
 
+const getConversations = async (req, res, next) => {
+    try {
+        const conversations = await messageService.getConversationsByUserId(req.user.id);
+
+        res.json({
+            conversations
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const cleanUserForMatch = (user) => ({
+    id: user.id,
+    subscription: user.subscription,
+    lastLogin: user.lastLogin,
+    profile: {
+        id: user.profile.id,
+        name: user.profile.name,
+        age: user.profile.age,
+        gender: user.profile.gender,
+        bio: user.profile.bio,
+        location: user.profile.location,
+        occupation: user.profile.occupation,
+        education: user.profile.education,
+        height: user.profile.height,
+        photos: user.profile.photos,
+        interests: user.profile.interests,
+        languages: user.profile.languages,
+        lookingFor: user.profile.lookingFor,
+        drinking: user.profile.drinking,
+        smoking: user.profile.smoking,
+        zodiac: user.profile.zodiac,
+        instagram: user.profile.instagram,
+        spotifyArtists: user.profile.spotifyArtists,
+        lastActive: user.profile.lastActive,
+        questions: user.profile.questions || []
+    }
+});
+
 const getMatchById = async (req, res, next) => {
     try {
         const match = await matchService.getMatchById(req.params.id, req.user.id);
-        res.json(match);
+
+        const response = {
+            id: match.id,
+            status: match.status,
+            compatibilityScore: match.compatibilityScore,
+            lastMessageAt: match.lastMessageAt,
+            createdAt: match.createdAt,
+            otherUser: cleanUserForMatch(match.otherUser)
+        };
+
+        res.json(response);
     } catch (error) {
         next(error);
     }
@@ -135,5 +186,6 @@ module.exports = {
     getMatchById,
     unmatch,
     getMatchStats,
-    getMatchesWithMessages
+    getMatchesWithMessages,
+    getConversations
 };

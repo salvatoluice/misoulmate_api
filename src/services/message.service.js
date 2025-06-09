@@ -1,6 +1,11 @@
 const messageRepository = require('../repositories/message.repository');
 const matchRepository = require('../repositories/match.repository');
 const { BadRequestError, NotFoundError, ForbiddenError } = require('../utils/errors');
+const { Match } = require('../models');
+const { User, Profile } = require('../models');
+const Sequelize = require('sequelize');
+const { Op } = Sequelize;
+const { Message } = require('../models');
 
 const sendMessage = async (matchId, senderId, content, media = null) => {
     const match = await matchRepository.findById(matchId);
@@ -65,7 +70,7 @@ const markMessageAsRead = async (messageId, userId) => {
     }
 
     if (message.senderId === userId) {
-        return message; 
+        return message;
     }
 
     return messageRepository.markAsRead(messageId);
@@ -99,6 +104,100 @@ const enrichMatchesWithMessages = async (matches, userId) => {
     }));
 };
 
+const getConversationsByUserId = async (userId) => {
+    // Find all matches where the user is a participant
+    const matches = await Match.findAll({
+        where: {
+            [Op.or]: [
+                { user1Id: userId },
+                { user2Id: userId }
+            ],
+            status: 'active'
+        },
+        include: [
+            {
+                model: User,
+                as: 'user1',
+                include: [
+                    {
+                        model: Profile,
+                        as: 'profile',
+                        attributes: ['name', 'photos']
+                    }
+                ],
+                attributes: ['id']
+            },
+            {
+                model: User,
+                as: 'user2',
+                include: [
+                    {
+                        model: Profile,
+                        as: 'profile',
+                        attributes: ['name', 'photos']
+                    }
+                ],
+                attributes: ['id']
+            }
+        ],
+        order: [['lastMessageAt', 'DESC']]
+    });
+
+    const matchIds = matches.map(match => match.id);
+
+    // Get only matches that have at least one message
+    const messageCountsByMatch = await Message.findAll({
+        attributes: [
+            'matchId',
+            [Sequelize.fn('COUNT', Sequelize.col('id')), 'messageCount']
+        ],
+        where: {
+            matchId: {
+                [Op.in]: matchIds
+            }
+        },
+        group: ['matchId'],
+        raw: true
+    });
+
+    // Get matches that have at least one message
+    const matchesWithMessages = matches.filter(match =>
+        messageCountsByMatch.some(
+            count => count.matchId === match.id && count.messageCount > 0
+        )
+    );
+
+    // Get latest messages and unread counts
+    const latestMessages = await messageRepository.getLatestMessagesByMatchIds(
+        matchesWithMessages.map(match => match.id)
+    );
+
+    const unreadCounts = await messageRepository.getUnreadCountsByMatchIds(
+        userId,
+        matchesWithMessages.map(match => match.id)
+    );
+
+    // Format the response
+    return matchesWithMessages.map(match => {
+        const isUser1 = match.user1Id === userId;
+        const otherUser = isUser1 ? match.user2 : match.user1;
+
+        return {
+            id: match.id,
+            otherUser: {
+                id: otherUser.id,
+                profile: otherUser.profile,
+                isOnline: false // You may want to add online status logic
+            },
+            matchPercentage: match.compatibilityScore,
+            createdAt: match.createdAt,
+            lastMessageAt: match.lastMessageAt,
+            latestMessage: latestMessages[match.id] || null,
+            unreadCount: unreadCounts[match.id] || 0
+        };
+    });
+};
+
 module.exports = {
     sendMessage,
     getMessageById,
@@ -106,5 +205,6 @@ module.exports = {
     markMessageAsRead,
     markAllMessagesAsRead,
     getUnreadCount,
-    enrichMatchesWithMessages
+    enrichMatchesWithMessages,
+    getConversationsByUserId
 };

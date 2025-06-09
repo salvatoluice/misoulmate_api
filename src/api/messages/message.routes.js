@@ -1,6 +1,7 @@
 const express = require('express');
 const messageController = require('./message.controller');
 const messageValidator = require('./message.validator');
+const matchController = require('../matches/match.controller');
 const { auth, validation } = require('../middlewares');
 
 const router = express.Router();
@@ -19,6 +20,12 @@ router.get(
     validation.validate(messageValidator.matchIdParamSchema, 'params'),
     validation.validate(messageValidator.getMessagesQuerySchema, 'query'),
     messageController.getMessages
+);
+
+router.get(
+    '/conversations',
+    auth.authenticate,
+    matchController.getConversations
 );
 
 router.get(
