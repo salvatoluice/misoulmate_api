@@ -1,6 +1,6 @@
 const messageRepository = require('../repositories/message.repository');
 const matchRepository = require('../repositories/match.repository');
-const { BadRequestError, NotFoundError, ForbiddenError } = require('../utils/errors');
+const { BadRequestError, ForbiddenError } = require('../utils/errors');
 const { Match } = require('../models');
 const { User, Profile } = require('../models');
 const Sequelize = require('sequelize');
