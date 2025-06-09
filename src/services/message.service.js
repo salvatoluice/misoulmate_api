@@ -105,7 +105,6 @@ const enrichMatchesWithMessages = async (matches, userId) => {
 };
 
 const getConversationsByUserId = async (userId) => {
-    // Find all matches where the user is a participant
     const matches = await Match.findAll({
         where: {
             [Op.or]: [
@@ -145,7 +144,6 @@ const getConversationsByUserId = async (userId) => {
 
     const matchIds = matches.map(match => match.id);
 
-    // Get only matches that have at least one message
     const messageCountsByMatch = await Message.findAll({
         attributes: [
             'matchId',
@@ -160,14 +158,12 @@ const getConversationsByUserId = async (userId) => {
         raw: true
     });
 
-    // Get matches that have at least one message
     const matchesWithMessages = matches.filter(match =>
         messageCountsByMatch.some(
             count => count.matchId === match.id && count.messageCount > 0
         )
     );
 
-    // Get latest messages and unread counts
     const latestMessages = await messageRepository.getLatestMessagesByMatchIds(
         matchesWithMessages.map(match => match.id)
     );
@@ -177,7 +173,6 @@ const getConversationsByUserId = async (userId) => {
         matchesWithMessages.map(match => match.id)
     );
 
-    // Format the response
     return matchesWithMessages.map(match => {
         const isUser1 = match.user1Id === userId;
         const otherUser = isUser1 ? match.user2 : match.user1;
@@ -187,7 +182,7 @@ const getConversationsByUserId = async (userId) => {
             otherUser: {
                 id: otherUser.id,
                 profile: otherUser.profile,
-                isOnline: false // You may want to add online status logic
+                isOnline: false
             },
             matchPercentage: match.compatibilityScore,
             createdAt: match.createdAt,
