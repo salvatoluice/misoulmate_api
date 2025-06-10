@@ -1,13 +1,8 @@
-// services/datePlan.service.js
 const datePlanRepository = require('../repositories/datePlan.repository');
 const matchRepository = require('../repositories/match.repository');
 const { BadRequestError, ForbiddenError } = require('../utils/errors');
 
-/**
- * Create a new date plan
- */
 const createDatePlan = async (matchId, userId, datePlanData) => {
-    // Verify match exists and user is a participant
     const match = await matchRepository.findById(matchId);
 
     if (match.status !== 'active') {
@@ -18,7 +13,6 @@ const createDatePlan = async (matchId, userId, datePlanData) => {
         throw new ForbiddenError('You can only create date plans for your matches');
     }
 
-    // Create date plan
     const datePlan = await datePlanRepository.create({
         matchId,
         creatorId: userId,
@@ -28,13 +22,9 @@ const createDatePlan = async (matchId, userId, datePlanData) => {
     return datePlan;
 };
 
-/**
- * Get a date plan by ID
- */
 const getDatePlanById = async (id, userId) => {
     const datePlan = await datePlanRepository.findById(id);
 
-    // Check if user is a participant in the match
     const match = datePlan.match;
     if (match.user1Id !== userId && match.user2Id !== userId) {
         throw new ForbiddenError('You do not have access to this date plan');
@@ -43,11 +33,7 @@ const getDatePlanById = async (id, userId) => {
     return datePlan;
 };
 
-/**
- * Get all date plans for a match
- */
 const getDatePlansByMatchId = async (matchId, userId) => {
-    // Verify match exists and user is a participant
     const match = await matchRepository.findById(matchId);
 
     if (match.user1Id !== userId && match.user2Id !== userId) {
@@ -57,25 +43,17 @@ const getDatePlansByMatchId = async (matchId, userId) => {
     return datePlanRepository.findByMatchId(matchId);
 };
 
-/**
- * Get upcoming date plans for a user
- */
 const getUpcomingDatePlans = async (userId, options = {}) => {
     return datePlanRepository.findUpcomingByUserId(userId, options);
 };
 
-/**
- * Update a date plan
- */
 const updateDatePlan = async (id, userId, datePlanData) => {
     const datePlan = await datePlanRepository.findById(id);
 
-    // Verify user is the creator
     if (datePlan.creatorId !== userId) {
         throw new ForbiddenError('Only the creator can update this date plan');
     }
 
-    // Cannot update a date plan that has already been responded to
     if (datePlan.status !== 'proposed') {
         throw new BadRequestError(`Cannot update a date plan with status: ${datePlan.status}`);
     }
