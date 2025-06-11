@@ -1,9 +1,11 @@
 const messageRepository = require('../repositories/message.repository');
 const matchRepository = require('../repositories/match.repository');
 const { BadRequestError, ForbiddenError } = require('../utils/errors');
-const { Match, User, Profile, Message } = require('../models');
+const { Match } = require('../models');
+const { User, Profile } = require('../models');
 const Sequelize = require('sequelize');
 const { Op } = Sequelize;
+const { Message } = require('../models');
 
 const sendMessage = async (matchId, senderId, content, media = null) => {
     const match = await matchRepository.findById(matchId);
@@ -31,12 +33,7 @@ const sendMessage = async (matchId, senderId, content, media = null) => {
 
     await matchRepository.updateLastMessageTime(matchId);
 
-    // Return the fully populated message with sender info
-    return findById(message.id);
-};
-
-const findById = async (id) => {
-    return messageRepository.findById(id);
+    return message;
 };
 
 const getMessageById = async (messageId, userId) => {
@@ -93,37 +90,21 @@ const getUnreadCount = async (userId) => {
     return messageRepository.countUnreadByUser(userId);
 };
 
-const enrichMatchesWithMessages = async (matches, userId, onlineService) => {
+const enrichMatchesWithMessages = async (matches, userId) => {
     const matchIds = matches.map(match => match.id);
 
     const latestMessages = await messageRepository.getLatestMessagesByMatchIds(matchIds);
 
     const unreadCounts = await messageRepository.getUnreadCountsByMatchIds(userId, matchIds);
 
-    // Get all other user IDs from matches
-    const otherUserIds = matches.map(match =>
-        match.user1Id === userId ? match.user2Id : match.user1Id
-    );
-
-    // Get online statuses if onlineService is provided
-    let onlineStatuses = {};
-    if (onlineService) {
-        onlineStatuses = await onlineService.getOnlineStatus(otherUserIds);
-    }
-
-    return matches.map(match => {
-        const otherUserId = match.user1Id === userId ? match.user2Id : match.user1Id;
-
-        return {
-            ...match,
-            latestMessage: latestMessages[match.id] || null,
-            unreadCount: unreadCounts[match.id] || 0,
-            otherUserOnline: onlineStatuses[otherUserId] || false
-        };
-    });
+    return matches.map(match => ({
+        ...match,
+        latestMessage: latestMessages[match.id] || null,
+        unreadCount: unreadCounts[match.id] || 0
+    }));
 };
 
-const getConversationsByUserId = async (userId, onlineService) => {
+const getConversationsByUserId = async (userId) => {
     const matches = await Match.findAll({
         where: {
             [Op.or]: [
@@ -192,28 +173,16 @@ const getConversationsByUserId = async (userId, onlineService) => {
         matchesWithMessages.map(match => match.id)
     );
 
-    // Get all other user IDs from matches
-    const otherUserIds = matchesWithMessages.map(match =>
-        match.user1Id === userId ? match.user2Id : match.user1Id
-    );
-
-    // Get online statuses if onlineService is provided
-    let onlineStatuses = {};
-    if (onlineService) {
-        onlineStatuses = await onlineService.getOnlineStatus(otherUserIds);
-    }
-
     return matchesWithMessages.map(match => {
         const isUser1 = match.user1Id === userId;
         const otherUser = isUser1 ? match.user2 : match.user1;
-        const otherUserId = otherUser.id;
 
         return {
             id: match.id,
             otherUser: {
-                id: otherUserId,
+                id: otherUser.id,
                 profile: otherUser.profile,
-                isOnline: onlineStatuses[otherUserId] || false
+                isOnline: false
             },
             matchPercentage: match.compatibilityScore,
             createdAt: match.createdAt,
