@@ -1,21 +1,16 @@
-/**
- * Application entry point
- */
-const app = require('./app');
+const { app, server } = require('./app');
 const { environment } = require('./config');
 const { testConnection } = require('./db/connection');
 const logger = require('./utils/logger');
 
-// Start the server
 const startServer = async () => {
     try {
-        // Test database connection
         await testConnection();
 
-        // Start the server
-        app.listen(environment.PORT, () => {
+        server.listen(environment.PORT, () => {
             logger.info(`Server running in ${environment.NODE_ENV} mode on port ${environment.PORT}`);
             logger.info(`API available at http://localhost:${environment.PORT}${environment.API_PREFIX}`);
+            logger.info(`Socket.IO server initialized and running`);
         });
     } catch (error) {
         logger.error('Failed to start server:', error);

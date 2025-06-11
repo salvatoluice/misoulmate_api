@@ -1,4 +1,3 @@
-// models/datePlan.js
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
@@ -70,7 +69,6 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     DatePlan.associate = function (models) {
-        // Associations
         DatePlan.belongsTo(models.Match, {
             foreignKey: 'match_id',
             as: 'match'

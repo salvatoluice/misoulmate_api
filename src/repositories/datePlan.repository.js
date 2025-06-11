@@ -1,18 +1,11 @@
-// repositories/datePlan.repository.js
 const { DatePlan, User, Profile, Match } = require('../models');
 const { Op } = require('sequelize');
 const { NotFoundError } = require('../utils/errors');
 
-/**
- * Create a new date plan
- */
 const create = async (datePlanData) => {
     return DatePlan.create(datePlanData);
 };
 
-/**
- * Find a date plan by ID with creator and match details
- */
 const findById = async (id) => {
     const datePlan = await DatePlan.findByPk(id, {
         include: [

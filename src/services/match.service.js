@@ -194,6 +194,25 @@ const getMatchStats = async (userId) => {
     };
 };
 
+const enrichMatchesWithOnlineStatus = async (matches, userId, onlineService) => {
+    // Get all other user IDs from matches
+    const otherUserIds = matches.map(match =>
+        match.user1Id === userId ? match.user2Id : match.user1Id
+    );
+
+    // Get online statuses
+    const onlineStatuses = await onlineService.getOnlineStatus(otherUserIds);
+
+    return matches.map(match => {
+        const otherUserId = match.user1Id === userId ? match.user2Id : match.user1Id;
+
+        return {
+            ...match,
+            otherUserOnline: onlineStatuses[otherUserId] || false
+        };
+    });
+};
+
 const getUserMatchesWithMessages = async (userId, options = {}) => {
     const matches = await getUserMatches(userId, options);
 
@@ -215,5 +234,6 @@ module.exports = {
     calculateCompatibilityScore,
     getLikers,
     getMatchStats,
-    getUserMatchesWithMessages
+    getUserMatchesWithMessages,
+    enrichMatchesWithOnlineStatus
 };
