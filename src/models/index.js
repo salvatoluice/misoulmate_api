@@ -8,6 +8,8 @@ const ProfileBoost = require('./profileBoost.model');
 const ProfileView = require('./profileView.model');
 const ProfileFilter = require('./profileFilter.model');
 const ProfileReport = require('./profileReport.model');
+const Subscription = require('./subscription.model');
+const Payment = require('./payment.model');
 
 const models = {
     User,
@@ -19,7 +21,9 @@ const models = {
     ProfileBoost,
     ProfileView,
     ProfileFilter,
-    ProfileReport
+    ProfileReport,
+    Subscription,
+    Payment
 };
 
 Object.keys(models).forEach(modelName => {
