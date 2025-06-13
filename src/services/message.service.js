@@ -7,33 +7,39 @@ const Sequelize = require('sequelize');
 const { Op } = Sequelize;
 const { Message } = require('../models');
 
-const sendMessage = async (matchId, senderId, content, media = null) => {
-    const match = await matchRepository.findById(matchId);
-
-    if (match.user1Id !== senderId && match.user2Id !== senderId) {
-        throw new ForbiddenError('You can only send messages to your matches');
+const sendMessage = async ({ senderId, receiverId, content }, io) => {
+    if (!senderId || !receiverId || !content) {
+        throw new CustomError('Missing required message fields', 400);
     }
 
-    if (match.status !== 'active') {
-        throw new BadRequestError('Cannot send messages to inactive matches');
-    }
+    const message = await Message.create({ senderId, receiverId, content });
 
-    const messageData = {
-        matchId,
-        senderId,
-        content
-    };
+    const populatedMessage = await Message.findByPk(message.id, {
+        include: [
+            { model: User, as: 'sender', attributes: ['id', 'username'] },
+            { model: User, as: 'receiver', attributes: ['id', 'username'] },
+        ]
+    });
 
-    if (media && media.url) {
-        messageData.mediaUrl = media.url;
-        messageData.mediaType = media.type || 'image';
-    }
+    io.to(`user:${receiverId}`).emit('newMessage', populatedMessage);
 
-    const message = await messageRepository.create(messageData);
+    return populatedMessage;
+};
 
-    await matchRepository.updateLastMessageTime(matchId);
-
-    return message;
+const getMessages = async (userA, userB) => {
+    return Message.findAll({
+        where: {
+            [Op.or]: [
+                { senderId: userA, receiverId: userB },
+                { senderId: userB, receiverId: userA },
+            ]
+        },
+        order: [['createdAt', 'ASC']],
+        include: [
+            { model: User, as: 'sender', attributes: ['id', 'username'] },
+            { model: User, as: 'receiver', attributes: ['id', 'username'] },
+        ]
+    });
 };
 
 const getMessageById = async (messageId, userId) => {
@@ -195,6 +201,7 @@ const getConversationsByUserId = async (userId) => {
 
 module.exports = {
     sendMessage,
+    getMessages,
     getMessageById,
     getMessagesByMatchId,
     markMessageAsRead,

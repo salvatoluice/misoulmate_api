@@ -2,14 +2,18 @@ const messageService = require('../../services/message.service');
 
 const sendMessage = async (req, res, next) => {
     try {
-        const { matchId } = req.params;
-        const { content, media } = req.body;
+        const io = req.app.get('io');
+        const { senderId, receiverId, content } = req.body;
 
-        const message = await messageService.sendMessage(matchId, req.user.id, content, media);
+        const message = await messageService.sendMessage({ senderId, receiverId, content }, io);
 
-        res.status(201).json(message);
-    } catch (error) {
-        next(error);
+        res.status(201).json({
+            status: 'success',
+            message: 'Message sent successfully',
+            data: message
+        });
+    } catch (err) {
+        next(err);
     }
 };
 
