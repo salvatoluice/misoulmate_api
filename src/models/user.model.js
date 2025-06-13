@@ -1,15 +1,8 @@
-/**
- * User model
- */
 const { DataTypes, Model } = require('sequelize');
 const { sequelize } = require('../db/connection');
 const { hashPassword } = require('../utils/crypto');
 
 class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     */
     static associate(models) {
         User.hasOne(models.Profile, {
             foreignKey: 'user_id',
@@ -17,10 +10,6 @@ class User extends Model {
         });
     }
 
-    /**
-     * Compare password
-     * @param {String} password - Password to compare
-     */
     async isPasswordMatch(password, utils) {
         return await utils.verifyPassword(password, this.password);
     }
@@ -65,8 +54,8 @@ User.init({
         field: 'last_login'
     },
     subscription: {
-        type: DataTypes.ENUM('Free', 'Premium', 'Gold'),
-        defaultValue: 'Free'
+        type: DataTypes.ENUM('Basic', 'Gold', 'Platinum', 'Diamond'),
+        defaultValue: 'Basic'
     },
     notifications: {
         type: DataTypes.BOOLEAN,

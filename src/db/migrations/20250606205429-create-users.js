@@ -39,8 +39,8 @@ module.exports = {
         allowNull: true
       },
       subscription: {
-        type: Sequelize.ENUM('Free', 'Premium', 'Gold'),
-        defaultValue: 'Free'
+        type: Sequelize.ENUM('Basic', 'Gold', 'Platinum', 'Diamond'),
+        defaultValue: 'Basic'
       },
       notifications: {
         type: Sequelize.BOOLEAN,

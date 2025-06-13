@@ -4,14 +4,14 @@ const createSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
     notifications: Joi.boolean().default(true),
-    subscription: Joi.string().valid('Free', 'Premium', 'Gold').default('Free')
+    subscription: Joi.string().valid('Basic', 'Gold', 'Platinum', 'Diamond').default('Basic')
 });
 
 const updateSchema = Joi.object({
     email: Joi.string().email(),
     password: Joi.string().min(8),
     notifications: Joi.boolean(),
-    subscription: Joi.string().valid('Free', 'Premium', 'Gold')
+    subscription: Joi.string().valid('Basic', 'Gold', 'Platinum', 'Diamond')
 }).min(1);
 
 const idParamSchema = Joi.object({
