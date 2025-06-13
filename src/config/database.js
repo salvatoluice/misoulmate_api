@@ -1,6 +1,3 @@
-// src/config/database.js
-
-// ✅ Load .env reliably
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 
 const environment = require('./environment');
